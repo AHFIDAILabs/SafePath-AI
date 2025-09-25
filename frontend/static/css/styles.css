@@ -1,0 +1,265 @@
+/* General Body & Typography */
+:root {
+    --primary-color: #0056b3;
+    --secondary-color: #007bff;
+    --background-color: #f4f7fc;
+    --card-bg-color: #ffffff;
+    --text-color: #333;
+    --heading-color: #002d5c;
+    --risk-high-color: #d9534f;
+    --risk-low-color: #5cb85c;
+    --protective-factor-color: #5cb85c;
+    --risk-factor-color: #d9534f;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+h1, h2, h3 {
+    color: var(--heading-color);
+}
+
+main {
+    flex-grow: 1;
+    padding: 2rem;
+}
+
+/* Navigation */
+nav {
+    background-color: var(--primary-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover, nav a.active {
+    background-color: var(--secondary-color);
+}
+
+/* Footer */
+footer {
+    background-color: #343a40;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+footer .logo {
+    height: 40px;
+}
+
+/* Home Page */
+.home-main .hero {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: var(--card-bg-color);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.home-main .hero h1 {
+    font-size: 2.5rem;
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: var(--primary-color);
+}
+
+.info-section {
+    background: var(--card-bg-color);
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+/* Dashboard Page */
+.dashboard-main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.form-container {
+    background: var(--card-bg-color);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+.checkbox-group input {
+    margin-right: 0.5rem;
+}
+
+/* Results Section */
+.results-container {
+    margin-top: 2rem;
+    background: var(--card-bg-color);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.results-summary {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-around;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    flex: 1;
+    padding: 1rem;
+    background: var(--background-color);
+    border-radius: 8px;
+}
+
+.summary-card h3 {
+    margin-top: 0;
+}
+
+.summary-card p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.risk-high { color: var(--risk-high-color); }
+.risk-low { color: var(--risk-low-color); }
+
+.ai-summary {
+    background: #e7f3ff;
+    border-left: 5px solid var(--primary-color);
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+}
+.ai-summary p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.charts-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.chart-card {
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* FAQ Page */
+.faq-main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    background: var(--card-bg-color);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.faq-item h2 {
+    margin-top: 0;
+}
+
+/* Loader */
+.loader {
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid var(--primary-color);
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+    .results-summary {
+        flex-direction: column;
+    }
+    nav {
+        flex-direction: column;
+        align-items: center;
+    }
+}
