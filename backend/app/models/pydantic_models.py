@@ -1,6 +1,6 @@
 # backend/app/models/pydantic_models.py: Pydantic models for request and response validation
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 class PredictionInput(BaseModel):
     # Direct features
@@ -10,7 +10,7 @@ class PredictionInput(BaseModel):
     educational_status: str = Field(..., example="No formal education", description="Educational level")
     employment_status_main: str = Field(..., example="Unemployed", description="Main Provider Employment Status")
     employment_status_victim_main: str = Field(..., example="Unemployed", description="Employment status")
-    who_survivor_victim_stay_with: str = Field(..., example="Spouse/Partner", description="Who do you live with?")
+    who_survivor_victim_stay_with: str = Field(..., example="Partner", description="Who do you live with?")
 
     # Binary vulnerability flags (0 or 1) - Only those used in TOP_FEATURES engineering
     PLWD: int = Field(0, example=0, description=" Do you have a disability? (1=yes, 0=no)")
@@ -62,6 +62,7 @@ class PredictionResponse(BaseModel):
     key_risk_factors: List[FeatureContribution] = Field(..., description="Top factors contributing to increased risk")
     key_protective_factors: List[FeatureContribution] = Field(..., description="Top factors providing protection/reducing risk")
     generative_summary: str = Field(..., description="Comprehensive AI-generated summary with assessment and recommendations")
+    processed_features: Dict[str, Any] = Field(..., description="Processed feature values sent to the model")
     
     class Config:
         schema_extra = {
@@ -93,7 +94,21 @@ class PredictionResponse(BaseModel):
                         "description": "Stable housing provides security and reduces risk"
                     }
                 ],
-                "generative_summary": "ASSESSMENT SUMMARY: The risk assessment indicates a low-risk profile with several protective factors present. The individual demonstrates strong community connections and stable housing arrangements, which serve as significant buffers against potential vulnerabilities. While some economic dependency factors are present, they are offset by supportive living arrangements and community integration. The overall risk profile suggests resilience and adequate support systems are in place.\n\nRECOMMENDATIONS: 1) Continue to strengthen existing community connections through ongoing participation in social activities and support networks. 2) Monitor economic stability and provide resources for financial literacy or income generation if circumstances change. 3) Maintain regular check-ins to ensure continued housing stability and address any emerging concerns. 4) Document current protective factors to inform future assessments and maintain continuity of care."
+                "generative_summary": "ASSESSMENT SUMMARY: The risk assessment indicates a low-risk profile with several protective factors present. . The individual demonstrates strong community connections and stable housing arrangements, which serve as significant buffers against potential vulnerabilities. While some economic dependency factors are present, they are offset by supportive living arrangements and community integration. The overall risk profile suggests resilience and adequate support systems are in place.\n\nRECOMMENDATIONS: 1) Continue to strengthen existing community connections through ongoing participation in social activities and support networks. 2) Monitor economic stability and provide resources for financial literacy or income generation if circumstances change. 3) Maintain regular check-ins to ensure continued housing stability and address any emerging concerns. 4) Document current protective factors to inform future assessments and maintain continuity of care.",
+                "processed_features": {
+                    "economic_dependency_score": 5.0,
+                    "survivor_sex": "Female",
+                    "survivor_age": 25.0,
+                    "who_survivor/victim_stay_with": "Spouse/Partner",
+                    "income_stability_score": 7.0,
+                    "housing_security_score": 6.0,
+                    "social_isolation_score": 2.0,
+                    "employment_status_victim_main": "Self employed",
+                    "educational_status": "Secondary",
+                    "community_connection_score": 8.0,
+                    "marital_status": "Married",
+                    "financial_access_proxy": 6.0
+                }
             }
         }
 

@@ -280,8 +280,9 @@ def preprocess_input(df: pd.DataFrame) -> pd.DataFrame:
     # Return only the features the model expects
     return df_processed[config.TOP_FEATURES]
 
+# UPDATED make_prediction function for prediction_service.py
 def make_prediction(input_data: dict) -> dict:
-    """Makes a prediction with detailed error handling."""
+    """Makes a prediction with detailed error handling and feature info."""
     try:
         print(f"Input data: {input_data}")
         
@@ -291,15 +292,42 @@ def make_prediction(input_data: dict) -> dict:
         # Feature engineering
         print("Engineering features...")
         engineered_df = engineer_features_for_prediction(input_data)
-        print(f"Engineered features shape: {engineered_df.shape}")
-        print(f"Engineered columns: {engineered_df.columns.tolist()}")
         
         # Preprocessing
         print("Preprocessing...")
         processed_df = preprocess_input(engineered_df)
-        print(f"Processed shape: {processed_df.shape}")
-        print(f"Processed columns: {processed_df.columns.tolist()}")
-        print(f"Processed dtypes: {processed_df.dtypes}")
+        
+        # Complete processed_features handling in make_prediction function
+        # Store the actual processed features for display in the frontend
+        processed_features = {}
+
+        # Include engineered features from the processed dataframe
+        for feature_name in config.TOP_FEATURES:
+            value = None
+            
+            # Priority 1: Get from engineered_df (for engineered features like scores)
+            if feature_name in engineered_df.columns:
+                value = engineered_df[feature_name].iloc[0]
+                print(f"Got {feature_name} from engineered_df: {value}")
+            
+            # Priority 2: Get from processed_df (for original features that were scaled/encoded)
+            elif feature_name in processed_df.columns:
+                value = processed_df[feature_name].iloc[0]
+                print(f"Got {feature_name} from processed_df: {value}")
+            
+            # Handle the value
+            if value is not None:
+                if isinstance(value, (int, float)):
+                    processed_features[feature_name] = float(value)
+                else:
+                    processed_features[feature_name] = str(value)
+            else:
+                # This should rarely happen if feature engineering is working correctly
+                processed_features[feature_name] = "N/A"
+                print(f"Warning: {feature_name} not found in either dataframe")
+
+        print(f"Final processed_features keys: {list(processed_features.keys())}")
+        print(f"Sample values: {[(k, v) for k, v in list(processed_features.items())[:3]]}")
         
         # Prediction
         print("Making prediction...")
@@ -311,7 +339,14 @@ def make_prediction(input_data: dict) -> dict:
         
         # Get explanations
         explanation = explanation_service.get_shap_explanation(processed_df)
-        summary = explanation_service.get_generative_summary(explanation)
+        
+        # SIMPLIFIED: Get generative summary with full context for intelligent fallbacks
+        summary = explanation_service.get_generative_summary(
+            explanation=explanation,
+            input_data=input_data,
+            prediction=prediction,
+            risk_probability=risk_probability
+        )
 
         return {
             "prediction": prediction,
@@ -319,7 +354,8 @@ def make_prediction(input_data: dict) -> dict:
             "confidence": float(confidence),
             "key_risk_factors": explanation['risk_factors'],
             "key_protective_factors": explanation['protective_factors'],
-            "generative_summary": summary
+            "generative_summary": summary,
+            "processed_features": processed_features
         }
         
     except Exception as e:

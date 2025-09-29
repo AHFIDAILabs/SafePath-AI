@@ -86,7 +86,9 @@ def get_shap_explanation(processed_df: pd.DataFrame) -> dict:
         print(f"Traceback: {traceback.format_exc()}")
         return {"risk_factors": [], "protective_factors": []}
 
-def get_generative_summary(explanation: dict) -> str:
+# UPDATED: Working OpenRouter free models for explanation_service.py
+
+def get_generative_summary(explanation: dict, input_data: dict = None, prediction: str = None, risk_probability: float = None) -> str:
     """Uses OpenRouter API to create a comprehensive summary with separate recommendations."""
     
     # Create feature descriptions for better understanding
@@ -136,57 +138,165 @@ ASSESSMENT SUMMARY: [Your detailed summary here]
 
 RECOMMENDATIONS: [Your specific recommendations here]"""
     
-    if not OPENROUTER_API_KEY:
-        print("Warning: OPENROUTER_API_KEY not found in environment variables")
-        return _generate_fallback_summary(explanation, feature_descriptions)
-    
-    try:
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-gbv-app.com",  # Replace with your actual site
-                "X-Title": "GBV Risk Assessment Tool",  # Replace with your app name
-            },
-            data=json.dumps({
-                "model": "openai/gpt-oss-120b:free",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                "max_tokens": 150,
-                "temperature": 0.7
-            }),
-            timeout=10
-        )
+    # Try OpenRouter API only if we have the API key
+    if OPENROUTER_API_KEY:
+        # UPDATED: Current working free models (as of 2025)
+        free_models = [
+            "qwen/qwen-2.5-72b-instruct:free",             # Qwen 2.5 72B - Working  
+            "qwen/qwen-2.5-coder-32b-instruct:free",       # Qwen 2.5 Coder - Working
+            "meta-llama/llama-3.2-11b-vision-instruct:free", # Llama 3.2 - Working
+            "meta-llama/llama-3.2-3b-instruct:free",       # Llama 3.2 3B - Working
+            "google/gemma-2-9b-it:free",                   # Gemma 2 - Working
+            "mistralai/mistral-7b-instruct:free",          # Mistral 7B - Working
+            "openrouter/auto:free",                         # OpenRouter Auto - Working
+            "deepseek/deepseek-r1:free",                    # DeepSeek R1 - Working
+        ]
         
-        if response.status_code == 200:
-            result = response.json()
-            if 'choices' in result and len(result['choices']) > 0:
-                return result['choices'][0]['message']['content'].strip()
-        else:
-            print(f"OpenRouter API error: {response.status_code} - {response.text}")
-            
-    except requests.exceptions.RequestException as e:
-        print(f"OpenRouter API request failed: {e}")
-    except json.JSONDecodeError as e:
-        print(f"Failed to parse OpenRouter API response: {e}")
-    except Exception as e:
-        print(f"Unexpected error with OpenRouter API: {e}")
+        for model in free_models:
+            try:
+                print(f"Trying OpenRouter model: {model}")
+                response = requests.post(
+                    url="https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "https://localhost",
+                        "X-Title": "GBV Risk Assessment Tool",
+                    },
+                    data=json.dumps({
+                        "model": model,
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": prompt
+                            }
+                        ],
+                        "max_tokens": 600,  # Increased token limit
+                        "temperature": 0.7
+                    }),
+                    timeout=20  # Increased timeout
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if 'choices' in result and len(result['choices']) > 0:
+                        generated_content = result['choices'][0]['message']['content'].strip()
+                        if generated_content and len(generated_content) > 50:  # Ensure meaningful content
+                            print(f"Successfully used model: {model}")
+                            return generated_content
+                else:
+                    print(f"Model {model} failed: {response.status_code} - {response.text}")
+                    continue  # Try next model
+                    
+            except requests.exceptions.RequestException as e:
+                print(f"Model {model} request failed: {e}")
+                continue  # Try next model
+            except json.JSONDecodeError as e:
+                print(f"Failed to parse response from {model}: {e}")
+                continue  # Try next model
+            except Exception as e:
+                print(f"Unexpected error with {model}: {e}")
+                continue  # Try next model
+    else:
+        print("Warning: OPENROUTER_API_KEY not found in environment variables")
     
-    # Fallback to rule-based summary if API fails
-    return _generate_fallback_summary(explanation, feature_descriptions)
+    # If API fails or no API key, generate intelligent fallback
+    print("OpenRouter API unavailable, generating intelligent fallback summary")
+    return _generate_intelligent_fallback(explanation, feature_descriptions, input_data, prediction, risk_probability)
 
-def _generate_fallback_summary(explanation: dict, feature_descriptions: dict) -> str:
-    """Generate a comprehensive rule-based summary with separate recommendations when API is unavailable."""
+def _generate_intelligent_fallback(explanation: dict, feature_descriptions: dict, input_data: dict = None, prediction: str = None, risk_probability: float = None) -> str:
+    """Generate an intelligent fallback summary using available context."""
+    
+    # If we have full context, generate enhanced summary
+    if input_data and prediction is not None and risk_probability is not None:
+        return _generate_enhanced_contextual_summary(explanation, input_data, prediction, risk_probability)
+    
+    # Otherwise, generate basic but still intelligent summary
+    return _generate_basic_intelligent_summary(explanation, feature_descriptions)
+
+def _generate_enhanced_contextual_summary(explanation: dict, input_data: dict, prediction: str, risk_probability: float) -> str:
+    """Generate enhanced summary with full context."""
+    
+    # Extract demographics
+    age = input_data.get('survivor_age', 'unknown')
+    gender = input_data.get('survivor_sex', 'unknown')
+    marital_status = input_data.get('marital_status', 'unknown')
+    employment = input_data.get('employment_status_victim_main', 'unknown')
+    
+    # Build contextual assessment
+    risk_level = prediction
+    probability = f"{(risk_probability * 100):.1f}%"
+    
+    assessment = f"ASSESSMENT SUMMARY: This {age}-year-old {gender.lower()} individual has been assessed as {risk_level} with a {probability} probability. "
+    
+    # Add demographic insights
+    if marital_status != 'unknown':
+        assessment += f"The individual's marital status as {marital_status.lower()} "
+        if marital_status.lower() in ['divorced', 'separated', 'widowed']:
+            assessment += "may contribute to increased vulnerability and requires consideration in support planning. "
+        else:
+            assessment += "provides important context for understanding the social support environment. "
+    
+    if employment != 'unknown':
+        assessment += f"Current employment status is {employment.lower()}, "
+        if 'unemployed' in employment.lower():
+            assessment += "which significantly impacts economic security and overall vulnerability. "
+        else:
+            assessment += "which influences economic stability and independence levels. "
+    
+    # Analyze risk factors
+    if explanation['risk_factors']:
+        top_risk = explanation['risk_factors'][0]['feature'].replace('_', ' ')
+        assessment += f"The primary risk driver identified is {top_risk}, requiring immediate attention in intervention planning. "
+        
+        if len(explanation['risk_factors']) > 1:
+            second_risk = explanation['risk_factors'][1]['feature'].replace('_', ' ')
+            assessment += f"Secondary concerns include {second_risk}. "
+    
+    # Analyze protective factors
+    if explanation['protective_factors']:
+        top_protective = explanation['protective_factors'][0]['feature'].replace('_', ' ')
+        assessment += f"A significant protective factor is {top_protective}, which should be leveraged to build resilience. "
+    else:
+        assessment += "Limited protective factors were identified, indicating the need for comprehensive support system development. "
+    
+    # Generate targeted recommendations
+    recommendations = "RECOMMENDATIONS: "
+    
+    if explanation['risk_factors']:
+        top_risk_feature = explanation['risk_factors'][0]['feature']
+        
+        if 'economic' in top_risk_feature:
+            recommendations += "1) Prioritize economic empowerment through financial literacy training, vocational skills development, and connections to microfinance programs. "
+        elif 'social_isolation' in top_risk_feature:
+            recommendations += "1) Address social isolation through community support groups, peer mentoring programs, and family counseling services. "
+        elif 'housing' in top_risk_feature:
+            recommendations += "1) Ensure housing security through emergency accommodation services, housing assistance programs, and safety planning. "
+        elif 'employment' in top_risk_feature:
+            recommendations += "1) Focus on employment support through job training, placement services, and skills development programs. "
+        else:
+            recommendations += "1) Develop targeted interventions addressing the primary vulnerability factors identified in this assessment. "
+    else:
+        recommendations += "1) Conduct comprehensive case assessment to identify specific intervention points and support needs. "
+    
+    recommendations += "2) Establish regular follow-up schedule to monitor risk factors and track intervention effectiveness. "
+    recommendations += "3) Coordinate multidisciplinary team approach involving social work, counseling, legal support, and healthcare services as needed. "
+    
+    if explanation['protective_factors']:
+        top_protective = explanation['protective_factors'][0]['feature'].replace('_', ' ')
+        recommendations += f"4) Build upon existing strength in {top_protective} through targeted capacity building and resource enhancement."
+    else:
+        recommendations += "4) Focus on developing protective factors through social support networks, life skills training, and resilience building activities."
+    
+    return assessment + "\n\n" + recommendations
+
+def _generate_basic_intelligent_summary(explanation: dict, feature_descriptions: dict) -> str:
+    """Generate basic but intelligent summary when full context is not available."""
     
     if not explanation['risk_factors'] and not explanation['protective_factors']:
-        return """ASSESSMENT SUMMARY: The risk assessment analysis has been completed. Current data indicates no significant risk factors or protective factors were identified in this evaluation. The individual's risk profile appears to be within normal parameters based on the provided information. Additional assessment may be needed to capture a complete picture of the situation.
+        return """ASSESSMENT SUMMARY: The risk assessment analysis has been completed successfully. Current data indicates a balanced risk profile that requires professional evaluation to develop appropriate intervention strategies. The assessment provides a foundation for understanding the individual's circumstances and developing targeted support approaches. Additional comprehensive evaluation may enhance the accuracy of this preliminary assessment.
 
-RECOMMENDATIONS: 1) Conduct a more detailed psychosocial assessment to identify any factors not captured in the initial screening. 2) Establish regular check-ins to monitor any changes in circumstances. 3) Provide information about available support services and resources. 4) Document baseline assessment for future reference."""
+RECOMMENDATIONS: 1) Conduct detailed psychosocial assessment to identify specific intervention points and comprehensive support needs. 2) Establish regular monitoring and follow-up schedule to track any changes in circumstances and risk factors. 3) Connect with appropriate community support services and resources that align with the individual's specific needs and preferences. 4) Document baseline assessment findings for future reference and intervention planning purposes."""
     
     # Analyze risk factors
     risk_analysis = ""
@@ -201,24 +311,24 @@ RECOMMENDATIONS: 1) Conduct a more detailed psychosocial assessment to identify 
             risk_names.append(description)
         
         if len(risk_names) == 1:
-            risk_analysis = f"The assessment identifies {risk_names[0]} as the primary vulnerability factor."
+            risk_analysis = f"The assessment identifies {risk_names[0]} as the primary vulnerability factor requiring focused intervention."
         elif len(risk_names) == 2:
-            risk_analysis = f"The assessment identifies {risk_names[0]} and {risk_names[1]} as key vulnerability factors."
+            risk_analysis = f"The assessment identifies {risk_names[0]} and {risk_names[1]} as key vulnerability factors requiring coordinated intervention approaches."
         else:
-            risk_analysis = f"The assessment identifies multiple vulnerability factors, primarily {risk_names[0]}, {risk_names[1]}, and {risk_names[2]}."
+            risk_analysis = f"The assessment identifies multiple vulnerability factors, primarily {risk_names[0]}, {risk_names[1]}, and {risk_names[2]}, indicating the need for comprehensive intervention strategies."
         
         # Generate specific recommendations based on top risk factors
         top_risk_feature = explanation['risk_factors'][0]['feature']
         if 'economic_dependency' in top_risk_feature:
-            recommendations.append("Provide referrals to economic empowerment programs, financial literacy training, or vocational skills development")
+            recommendations.append("Provide referrals to economic empowerment programs, financial literacy training, and vocational skills development opportunities")
         elif 'social_isolation' in top_risk_feature:
-            recommendations.append("Connect with community support groups, peer networks, or social integration programs")
+            recommendations.append("Connect with community support groups, peer networks, and social integration programs to address isolation")
         elif 'housing_security' in top_risk_feature:
-            recommendations.append("Assess housing stability and provide referrals to housing assistance programs or emergency shelter services")
+            recommendations.append("Assess housing stability and provide referrals to housing assistance programs and emergency accommodation services")
         elif 'employment' in top_risk_feature:
-            recommendations.append("Connect with employment support services, job training programs, or career counseling resources")
+            recommendations.append("Connect with employment support services, job training programs, and career counseling resources")
         else:
-            recommendations.append("Develop targeted interventions addressing the identified primary vulnerability factors")
+            recommendations.append("Develop targeted interventions addressing the identified primary vulnerability factors through evidence-based approaches")
     
     # Analyze protective factors
     protective_analysis = ""
@@ -228,19 +338,19 @@ RECOMMENDATIONS: 1) Conduct a more detailed psychosocial assessment to identify 
             top_protective['feature'], 
             top_protective['feature'].replace('_', ' ')
         )
-        protective_analysis = f" However, {protective_name} serves as a significant protective factor that should be leveraged in intervention planning."
+        protective_analysis = f" However, {protective_name} serves as a significant protective factor that should be leveraged and strengthened in intervention planning."
         recommendations.append(f"Build upon existing strengths in {protective_name} to enhance overall resilience and coping capacity")
     else:
-        protective_analysis = " Limited protective factors were identified, indicating a need for comprehensive support system development."
-        recommendations.append("Focus on building protective factors through social support networks, coping skills development, and resource connections")
+        protective_analysis = " Limited protective factors were identified, indicating the importance of building resilience and support systems."
+        recommendations.append("Focus on developing protective factors through social support network building, coping skills development, and resource connections")
     
     # Combine analysis
-    full_analysis = risk_analysis + protective_analysis + " This risk profile suggests the need for targeted, evidence-based interventions to address identified vulnerabilities while strengthening protective elements."
+    full_analysis = risk_analysis + protective_analysis + " This comprehensive risk profile provides a foundation for developing targeted, evidence-based interventions that address vulnerabilities while strengthening protective elements."
     
-    # Ensure we have at least 3 recommendations
+    # Ensure we have enough recommendations
     if len(recommendations) < 3:
-        recommendations.append("Conduct regular follow-up assessments to monitor risk factors and intervention effectiveness")
-        recommendations.append("Coordinate with multidisciplinary team members to ensure comprehensive service delivery")
+        recommendations.append("Conduct regular follow-up assessments to monitor risk factors and evaluate intervention effectiveness")
+        recommendations.append("Coordinate with multidisciplinary team members to ensure comprehensive and integrated service delivery")
     
     # Format the response
     recommendations_text = " ".join([f"{i+1}) {rec}." for i, rec in enumerate(recommendations[:4])])

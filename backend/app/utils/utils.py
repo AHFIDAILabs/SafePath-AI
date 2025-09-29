@@ -1,5 +1,4 @@
-# backend/app/utils/utils.py: 
-# backend/app/utils/utils.py
+# backend/app/utils/utils.py: Utility functions for model handling, data validation, and other helpers.
 import joblib
 import os
 import json
