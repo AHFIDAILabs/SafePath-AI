@@ -190,7 +190,6 @@
       margin-top: 1rem;
     }
 
-    /* Validation styling */
     .form-validation-info {
       background: rgba(243, 156, 18, 0.1);
       border: 1px solid rgba(243, 156, 18, 0.3);
@@ -208,7 +207,7 @@
     /* Results Section Styles */
     .results-container {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1200px;
       background: var(--panel-bg);
       backdrop-filter: blur(12px);
       padding: 2rem;
@@ -219,31 +218,39 @@
       animation: fadeInUp 0.8s ease;
     }
 
+    .results-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
     .results-summary {
       display: flex;
       gap: 1.5rem;
-      justify-content: space-around;
+      justify-content: center;
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 3rem;
       flex-wrap: wrap;
     }
 
     .summary-card {
       flex: 1;
       min-width: 200px;
-      padding: 1rem;
+      max-width: 250px;
+      padding: 1.5rem;
       background: rgba(255,255,255,0.1);
-      border-radius: 8px;
+      border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.2);
     }
 
     .summary-card h3 {
       margin-top: 0;
-      color: #fff;
+      color: #18bc9c;
+      font-size: 1rem;
+      margin-bottom: 1rem;
     }
 
     .summary-card p {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: bold;
       margin-bottom: 0;
     }
@@ -251,42 +258,128 @@
     .risk-high { color: #ff6b6b; }
     .risk-low { color: #51cf66; }
 
-    .ai-summary {
-      background: rgba(255,255,255,0.1);
-      border-left: 5px solid var(--secondary-color);
+    /* NEW: Tab Navigation Styles */
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      border-bottom: 2px solid rgba(24, 188, 156, 0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
       padding: 1rem 1.5rem;
-      margin-bottom: 2rem;
-      border-radius: 5px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: #e0e0e0;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px; /* Align with parent border */
     }
 
-    .ai-summary p {
-      margin: 0;
-      line-height: 1.6;
-    }
-
-    .charts-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-    }
-
-    @media (max-width: 768px) {
-      .charts-container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .chart-card {
-      padding: 1.5rem;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .chart-card h3 {
-      margin-top: 0;
+    .tab-btn:hover {
+      background: rgba(24, 188, 156, 0.1);
       color: #fff;
+    }
+
+    .tab-btn.active {
+      color: var(--secondary-color);
+      border-bottom-color: var(--secondary-color);
+    }
+
+    .tab-btn i {
+      margin-right: 0.5rem;
+    }
+
+    /* UPDATED: Analysis Section Styles for Tabs */
+    .analysis-content-area {
+      margin-top: 1.5rem;
+    }
+    
+    .tab-pane {
+      display: none; /* Hide panes by default */
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .tab-pane.active {
+      display: block; /* Show active pane */
+    }
+
+    .analysis-section {
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 2rem;
+      min-height: 450px;
+    }
+
+    .analysis-section h3 {
+      margin: 0 0 1.5rem 0;
+      color: #18bc9c;
+      font-size: 1.5rem;
       text-align: center;
+    }
+
+    .insights-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .summary-section, .recommendations-section {
+      background: rgba(255,255,255,0.05);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .summary-section h4, .recommendations-section h4 {
+      color: #18bc9c;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .summary-section ul, .recommendations-section ul {
+      margin: 0.5rem 0;
+      padding-left: 1.2rem;
+    }
+
+    .summary-section li, .recommendations-section li {
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      color: #e0e0e0;
+    }
+
+    .chart-container {
+      height: 450px;
+      position: relative;
+    }
+    
+    .chart-description {
+      margin-top: 15px;
+      padding: 15px;
+      background: #222;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      line-height: 1.6;
+      border-left: 4px solid #18bc9c;
+    }
+
+    .model-input-display {
+      background: rgba(0,0,0,0.3);
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #e0e0e0;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      line-height: 1.4;
     }
 
     .loader {
@@ -346,41 +439,6 @@
         transform: translateY(0);
       }
     }
-    .summary-section {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.recommendations-section {
-  margin-top: 1rem;
-}
-
-.summary-section h4,
-.recommendations-section h4 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.7rem;
-  font-weight: 600;
-  color: #18bc9c;
-}
-
-.summary-section p,
-.recommendations-section p {
-  color: #e0e0e0;
-  margin-bottom: 0.5rem;
-}
-
-.recommendations-section ul {
-  color: #e0e0e0;
-  margin: 0;
-}
-
-.recommendations-section li {
-  margin-bottom: 0.7rem;
-  padding-left: 0.5rem;
-}
   </style>
 </head>
 <body>
@@ -393,13 +451,13 @@
 
   <main>
     <section class="form-section">
-      <h2>Assess GBV Risk Profile</h2>
-
+      <h2>Assessing Individual Risk of Gender-Based Violence (GBV)</h2>
+      
       <div class="form-validation-info" style="text-align: center;">
-        <p><i class="fas fa-info-circle"></i> All fields are required. Please fill in each section accurately to get a reliable risk assessment.</p>
+        <p><i class="fas fa-info-circle"></i> All fields must be filled in accurately for a reliable risk assessment.</p>
       </div>
       
-      <form id="prediction-form" method="post" action="">
+      <form id="prediction-form" method="post" action="" onsubmit="return false;">
         <div class="form-content-container">
           <!-- Socio-demographic Factors -->
           <div class="socio-demographic-section">
@@ -514,7 +572,10 @@
     <div id="results-container" class="results-container" style="display: none;">
       <div id="loader" class="loader" style="display: none;"></div>
       <div id="results-content">
-        <h2>Prediction Result</h2>
+        <div class="results-header">
+          <h2>Prediction Result</h2>
+        </div>
+        
         <div class="results-summary">
           <div class="summary-card">
             <h3>Risk Level</h3>
@@ -529,19 +590,51 @@
             <p id="confidence-text"></p>
           </div>
         </div>
-        <!-- Results section - replace the existing ai-summary div with this enhanced version -->
-        <div class="ai-summary">
-          <h3>AI-Generated Analysis & Recommendations</h3>
-          <div id="generative-summary" style="line-height: 1.6;"></div>
+
+        <!-- NEW: Tab Navigation -->
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="showTab('insights')"><i class="fas fa-brain"></i> Data-Driven Insights</button>
+          <button class="tab-btn" onclick="showTab('drivers')"><i class="fas fa-balance-scale"></i> Key Drivers of the Prediction</button>
+          <button class="tab-btn" onclick="showTab('input')"><i class="fas fa-code"></i> Model Input</button>
         </div>
-        <div class="charts-container">
-          <div class="chart-card">
-            <h3>Key Risk Factors (Increasing Risk)</h3>
-            <canvas id="risk-factors-chart"></canvas>
+
+        <!-- NEW: Tab Content Area -->
+        <div class="analysis-content-area">
+          <!-- I. Data-Driven Insights Pane -->
+          <div id="insights-section" class="tab-pane active">
+            <div class="analysis-section">
+                <h3>Data-Driven Insights</h3>
+                <div class="insights-content">
+                    <div class="summary-section">
+                        <h4><i class="fas fa-chart-line"></i> Assessment Summary and Analysis</h4>
+                        <ul id="assessment-summary"><!-- Populated by JavaScript --></ul>
+                    </div>
+                    <div class="recommendations-section">
+                        <h4><i class="fas fa-lightbulb"></i> Recommendations</h4>
+                        <ul id="recommendations-list"><!-- Populated by JavaScript --></ul>
+                    </div>
+                </div>
+            </div>
           </div>
-          <div class="chart-card">
-            <h3>Key Protective Factors (Decreasing Risk)</h3>
-            <canvas id="protective-factors-chart"></canvas>
+
+          <!-- II. Key Drivers Pane -->
+          <div id="drivers-section" class="tab-pane">
+            <div class="analysis-section">
+                <h3>Key Drivers of the Prediction</h3>
+                <div class="chart-container">
+                    <canvas id="waterfall-chart"></canvas>
+                    <div class="chart-description"></div>
+                </div>
+            </div>
+          </div>
+
+          <!-- III. Model Input Pane -->
+          <div id="input-section" class="tab-pane">
+            <div class="analysis-section">
+                <h3>Model Input</h3>
+                <h4 style="color: #18bc9c; margin-bottom: 1rem;">Features sent to the model</h4>
+                <div class="model-input-display" id="model-features"></div>
+            </div>
           </div>
         </div>
       </div>
