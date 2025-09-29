@@ -8,12 +8,25 @@
         "maxLambdaSize": "15mb",
         "runtime": "python3.11"
       }
+    },
+    {
+      "src": "frontend/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/templates/$1.html"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/templates/index.html"
     }
-  ]
+  ],
+  "installCommand": "pip install -r backend/requirements.txt"
 }
