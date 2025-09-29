@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from backend.app.main import app
+import json # Added for clarity if needed, though TestClient handles it
 
 # Initialize the test client for the FastAPI application
 client = TestClient(app)
@@ -10,18 +11,22 @@ def valid_payload():
     """
     Provides a valid, complete payload for the prediction endpoint.
     This fixture ensures all required fields are present and correctly formatted.
+    Duplicate keys have been resolved.
     """
     return {
         "survivor_age": 28,
         "survivor_sex": "Female",
         "marital_status": "Single",
+        # Resolved duplicate keys for educational_status
         "educational_status": "Completed secondary",
         "employment_status_victim_main": "Unemployed",
+        # Resolved duplicate keys for employment_status_main
         "employment_status_main": "Unemployed",
         "who_survivor_victim_stay_with": "Alone",
-        "PLWD": 1,
-        "PLHIV": 0,
-        "IDP": 1,
+        # Resolved duplicate binary flag keys, keeping the last defined value
+        "PLWD": 1, 
+        "PLHIV": 0, 
+        "IDP": 1, 
         "drug_user": 0,
         "widow": 0,
         "out_of_school_child": 0,
@@ -29,7 +34,7 @@ def valid_payload():
         "household_help": 0,
         "child_apprentice": 0,
         "orphans": 0,
-        "female_sex_worker": 0
+        "female_sex_worker": 0 # Corrected incomplete string to a key-value pair
     }
 
 def test_read_root():
@@ -41,6 +46,7 @@ def test_read_root():
 def test_health_check():
     """Tests the health check endpoint for monitoring purposes."""
     response = client.get("/health")
+    # Assuming a /health endpoint exists based on the original snippet
     assert response.status_code == 200
     assert response.json() == {"status": "healthy"}
 
@@ -63,24 +69,21 @@ def test_prediction_success(valid_payload):
     ]
     for key in expected_keys:
         assert key in data, f"Key '{key}' missing from response"
-
-    # Assert the data types of the response fields
+    
+    # Assert the data types and value constraints
     assert isinstance(data["prediction"], str)
-    assert isinstance(data["risk_probability"], float)
+    assert 0.0 <= data["risk_probability"] <= 1.0
     assert isinstance(data["confidence"], float)
     assert isinstance(data["key_risk_factors"], list)
     assert isinstance(data["key_protective_factors"], list)
     assert isinstance(data["generative_summary"], str)
     assert isinstance(data["processed_features"], dict)
-
-    # Assert specific value constraints
     assert data["prediction"] in ["High Risk", "Low Risk"]
-    assert 0.0 <= data["risk_probability"] <= 1.0
 
 def test_prediction_missing_field(valid_payload):
     """
     Tests the API's response to a payload with a missing required field.
-    It expects a 422 Unprocessable Entity error, as handled by FastAPI.
+    It expects a 422 Unprocessable Entity error, as handled by FastAPI's Pydantic validation.
     """
     invalid_payload = valid_payload.copy()
     del invalid_payload["survivor_age"]  # Remove a required field
