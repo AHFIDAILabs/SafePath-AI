@@ -2,10 +2,11 @@ services:
   - type: web
     name: gbv-predictive-api
     # No need for 'env: python' or 'env: docker' if Dockerfile is present
-    rootDir: backend # Render looks for backend/Dockerfile
+    rootDir: . # <--- CRITICAL CHANGE: Set context to project root
     # buildCommand and startCommand are now defined *inside* the Dockerfile
     
     envVars:
-      - key: PYTHONPATH
-        value: .
+      # Set PYTHONPATH to include the 'backend' folder so Uvicorn can run 'app.main:app'
+      - key: PYTHONPATH 
+        value: backend 
     healthCheckPath: /
