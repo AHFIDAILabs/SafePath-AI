@@ -4,17 +4,18 @@ FROM python:3.11-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY ./requirements.txt /app/
+# The files are now copied from their location *relative to the project root*
+# Requirements is inside the backend/ folder:
+COPY ./backend/requirements.txt /app/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy the app, artifacts (which are inside backend), and src (which is outside backend)
-COPY ./app /app/app
-COPY ./artifacts /app/artifacts
-COPY ../src /app/src
+# Copy all application directories:
+COPY ./backend/app /app/app
+COPY ./backend/artifacts /app/artifacts
+COPY ./src /app/src  # <--- THIS NOW WORKS! src is at the root.
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
@@ -23,4 +24,5 @@ EXPOSE 8000
 ENV PYTHONPATH=/app
 
 # Run main.py when the container launches
+# Uvicorn entry point is still 'app.main:app' within the container
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
