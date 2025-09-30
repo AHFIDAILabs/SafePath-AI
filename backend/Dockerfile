@@ -11,10 +11,10 @@ COPY ./requirements.txt /app/
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the app, artifacts, and src directories into the container
+# Copy the app, artifacts (which are inside backend), and src (which is outside backend)
 COPY ./app /app/app
 COPY ./artifacts /app/artifacts
-COPY ./src /app/src 
+COPY ../src /app/src
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
