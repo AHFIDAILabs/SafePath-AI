@@ -25,9 +25,7 @@ jobs:
         pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
     - name: Test with pytest (strict mode for CI)
-      run: |
-        cd backend
-        pytest --maxfail=1 --disable-warnings -q
+      run: pytest --maxfail=1 --disable-warnings -q
 
   build-and-push-docker:
     needs: test-and-lint
