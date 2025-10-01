@@ -15,9 +15,10 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 # Copy all application directories:
 COPY ./backend/app /app/app
 COPY ./backend/artifacts /app/artifacts
+
+# Copy frontend templates and static files
 COPY ./frontend/templates /app/templates
 COPY ./frontend/static /app/static
-COPY ./src /app/src  
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
