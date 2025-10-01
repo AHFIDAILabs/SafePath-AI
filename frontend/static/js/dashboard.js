@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const response = await fetch('https://predict-gbv-risk.onrender.com/api/v1/predict', { //'http://127.0.0.1:8000/api/v1/predict' -> for local testing
+            const response = await fetch('/api/v1/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
