@@ -1,4 +1,4 @@
-# backend/app/main.py
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +12,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS Middleware to allow frontend communication
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,8 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static files only if directory exists
+if os.path.isdir("backend/static"):
+    app.mount("/static", StaticFiles(directory="backend/static"), name="static")
+elif os.path.isdir("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Templates
 templates = Jinja2Templates(directory="templates")
@@ -51,7 +54,7 @@ async def faq(request: Request):
 def health_check():
     return {"status": "healthy"}
 
-# Catch-all: render homepage for any unknown path
+# Catch-all
 @app.get("/{full_path:path}", response_class=HTMLResponse)
 async def catch_all(request: Request, full_path: str):
     return templates.TemplateResponse("index.html", {"request": request})
