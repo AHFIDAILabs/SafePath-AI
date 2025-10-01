@@ -4,15 +4,14 @@ FROM python:3.11-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# The files are now copied from their location *relative to the project root*
-# Requirements is inside the backend/ folder:
+# Copy requirements first to leverage Docker layer caching
 COPY ./backend/requirements.txt /app/
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy all application directories:
+# Copy backend application code and artifacts
 COPY ./backend/app /app/app
 COPY ./backend/artifacts /app/artifacts
 
@@ -20,12 +19,19 @@ COPY ./backend/artifacts /app/artifacts
 COPY ./frontend/templates /app/templates
 COPY ./frontend/static /app/static
 
-# Make port 8000 available to the world outside this container
+# --- Validate artifacts exist (fail fast if missing) ---
+RUN test -f /app/artifacts/gradient_boosting_gbv_model.pkl \
+ && test -f /app/artifacts/scalers.pkl \
+ && test -f /app/artifacts/label_encoders.pkl \
+ && test -f /app/artifacts/analysis/top_features.json \
+ && test -f /app/artifacts/analysis/optimal_threshold.json \
+ || (echo "❌ Required model artifacts are missing! Please train the model first." && exit 1)
+
+# Make port 8000 available
 EXPOSE 8000
 
 # Define environment variable for Python path
 ENV PYTHONPATH=/app
 
-# Run main.py when the container launches
-# Uvicorn entry point is still 'app.main:app' within the container
+# Run the FastAPI app with Uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
