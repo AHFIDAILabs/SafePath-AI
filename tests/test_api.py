@@ -1,17 +1,14 @@
+import os
 import pytest
 from fastapi.testclient import TestClient
 from backend.app.main import app
-import json  # optional but fine to keep
+import json
 
-# Initialize the test client for the FastAPI application
+# Initialize the test client
 client = TestClient(app)
 
 @pytest.fixture
 def valid_payload():
-    """
-    Provides a valid, complete payload for the prediction endpoint.
-    This fixture ensures all required fields are present and correctly formatted.
-    """
     return {
         "survivor_age": 28,
         "survivor_sex": "Female",
@@ -36,7 +33,13 @@ def valid_payload():
 def test_read_root():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Welcome to the GBV Predictive Tool API"}
+
+    if os.getenv("CI") == "true":
+        assert response.headers["content-type"] == "application/json"
+        assert response.json() == {"message": "Welcome to the GBV Predictive Tool API"}
+    else:
+        assert "text/html" in response.headers["content-type"]
+        assert "<!DOCTYPE html>" in response.text or "<html" in response.text
 
 def test_health_check():
     response = client.get("/health")
