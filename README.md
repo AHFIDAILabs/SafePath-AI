@@ -1,45 +1,229 @@
-# AI-Powered Gender-Based Violence (GBV) Predictive Tool
+# 🧭 SafePath-AI: GBV Vulnerability Predictive Tool
+SafePath-AI is a full-stack, data-driven machine learning application designed to **predict the vulnerability of individuals to Gender-Based Violence (GBV)** using socio-demographic and contextual indicators. It features a robust Python-based ML pipeline, a FastAPI-powered prediction API, **explainable AI (SHAP)**, and **AI-generated summaries** to provide interpretable, human-readable insights that support case management and social intervention decisions. It is fully containerized for reliable deployment.
+---
 
-A proactive, data-driven tool designed to predict individuals at risk of Gender-Based Violence (GBV) using historical case data and demographic patterns. Unlike reactive models that rely on confirmed incidents, this system identifies vulnerability early to support timely, targeted interventions and prevention strategies.
+## Table of contents
+* Project structure
+* Overview
+* Installation and Setup
+* API reference
+Technical documentation
+Testing and CI
+Deployment
+Security and operational notes
+How to extend
 
-This repository contains the source code for a full-stack web application designed to predict the risk of Gender-Based Violence. It uses a Gradient Boosting machine learning model trained on socio-economic and demographic data.
+## 🏗️ Project Structure
+The project is organized into two main components: backend (the ML pipeline and API) and frontend (the user interface).
 
-## Features
+```text
+SafePath-AI/
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml
+│       # Continuous Integration and Deployment configuration
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── predict.py
+│   │   │       # FastAPI endpoint for prediction requests
+│   │   ├── config/
+│   │   │   └── config.py
+│   │   │       # Model paths and artifact configuration
+│   │   ├── models/
+│   │   │   └── pydantic_models.py
+│   │   │       # Input and output validation schemas
+│   │   ├── services/
+│   │   │   ├── prediction_service.py
+│   │   │   │   # Feature engineering, preprocessing, and prediction
+│   │   │   └── explanation_service.py
+│   │   │       # SHAP explanations and AI-generated summaries
+│   │   ├── utils/
+│   │   │   └── utils.py
+│   │   │       # Utility functions (artifact loading, logging, validation)
+│   │   └── main.py
+│   │       # FastAPI app setup, routes, and middleware
+│   ├── artifacts/
+│   │   ├── gradient_boosting_gbv_model.pkl
+│   │   ├── scalers.pkl
+│   │   ├── label_encoders.pkl
+│   │   └── analysis/
+│   │       ├── top_features.json
+│   │       └── optimal_threshold.json
+│   └── requirements.txt
+├── src/
+│   ├── config/
+│   │   └── config.py
+│   │       # Configuration for training pipeline
+│   ├── data_processing/
+│   │   └── preprocessor.py
+│   │       # Data cleaning, encoding, and feature engineering for training
+│   ├── training/
+│   │   ├── train.py
+│   │   └── trainer.py
+│   │       # Model training orchestration and artifact saving
+│   └── evaluation/
+│       └── evaluator.py
+│           # Model performance metrics and threshold optimization
+├── data/
+│   ├── raw/
+│   └── preprocessed/
+│       # Training and testing datasets
+├── frontend/
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── styles.css
+│   │   ├── js/
+│   │   │   └── dashboard.js
+│   │   └── images/
+│   │       ├── ahfid_logo.png
+│   │       └── home.png
+│   └── templates/
+│       ├── index.html
+│       ├── dashboard.html
+│       └── faq.html
+├── notebooks/
+│   # Jupyter notebooks for experimentation and analysis
+├── Dockerfile
+│   # Docker configuration for containerized deployment
+├── render.yaml
+│   # Render.com deployment configuration
+├── pytest.ini
+│   # Pytest configuration
+├── .env
+│   # Environment variables (API keys, etc.)
+├── .gitignore
+│
+└── README.md
+```
 
-- **High-Accuracy Predictions**: Utilizes a model with 99.6% accuracy and 99.5% sensitivity.
-- **Explainable AI (XAI)**: Integrates SHAP to explain the factors driving each prediction.
-- **Generative AI Summaries**: Provides concise, human-readable summaries of risk profiles for non-technical users.
-- **Modular Architecture**: Built with a FastAPI backend and a clean HTML/CSS/JS frontend.
-- **Containerized**: Dockerized for easy and consistent deployment.
-- **CI/CD Ready**: Includes a GitHub Actions workflow for automated testing and deployment.
+## 📖 Overview 
+SafePath AI provides:
+    * **Risk Assessment** – A model that ingests demographic, behavioural and contextual data to compute a GBV risk score.
+    * **Explanation Engine** – Extracts the most influential risk and protective factors from the model output.
+    * **Recommendation Generator** – Produces actionable recommendations based on the top risk & protective factors.
+    
+The backend exposes a simple REST API (`/predict`) that accepts JSON payloads and returns a structured response
 
-## Project Structure
+## ⚙️ Installation and Setup
+    1. Prerequisites
+        * Python 3.11 or newer
+        * Docker (optional, for containerized environments)
+        * Model artifacts must exist in backend/artifacts
+        * OpenRouter API key (for AI-generated summaries)
 
-- `backend/`: Contains the FastAPI application, services, and Dockerfile.
-- `src/`: Contains the Python scripts for data preprocessing and model training.
-- `frontend/`: Contains the HTML, CSS, and JavaScript for the user interface.
-- `data/`: Contains the training data.
-- `tests/`: Contains unit and integration tests.
-- `.github/`: Contains the CI/CD workflow definition.
+    2. Clone the Repository
+    ```bash
+        git clone https://github.com/<your-org>/SafePath-AI.git
+        cd SafePath-AI
+    ```
 
-## Getting Started
+    3. Backend Installation
+    ```bash
+        cd backend
+        pip install -r requirements.txt
+    ```
 
-### Prerequisites
+    4. Environment Configuration
+       Create a .env file in the project root:
+    ```env
+        OPENROUTER_API_KEY=your_api_key_here
+    ```
+    If this key is not provided, the API will automatically use an intelligent fallback summary generator.
 
-- Python 3.11+
-- Docker
-- An environment variable manager (e.g., `python-dotenv`)
+    5. Run the API Server
+    ```bash
+        uvicorn app.main:app --reload --port 8000
+    ```
+    Access the API documentation at: http://localhost:8000/docs
 
-### 1. Training the Model (Run once)
+## 🧠 Prediction API
+Endpoint: POST /api/v1/predict
 
-First, you need to run the training pipeline to generate the model artifacts.
+Sample Request:
+```
+    {
+    "survivor_age": 25,
+    "survivor_sex": "Female",
+    "marital_status": "Married",
+    "educational_status": "Secondary",
+    "employment_status_main": "Self employed",
+    "employment_status_victim_main": "Unemployed",
+    "who_survivor_victim_stay_with": "Partner"
+    }
+```
+Sample Response:
+```
+    {
+    "prediction": "Low Risk",
+    "risk_probability": 0.15,
+    "confidence": 0.85,
+    "key_risk_factors": [
+        { "feature": "economic_dependency_score", "impact": 0.12 }
+    ],
+    "key_protective_factors": [
+        { "feature": "community_connection_score", "impact": -0.25 }
+    ],
+    "generative_summary": "ASSESSMENT SUMMARY: The individual demonstrates...",
+    "processed_features": { "economic_dependency_score": 5.0, "survivor_sex": "Female" }
+}
+```
 
+## 🧩 Core Features
+* **Feature Engineering:** Generates risk and protection indicators from input data.
+* **RESTful Prediction API:** Fast and reliable endpoint for risk prediction.
+* **Web Interface:** Serves static content via Jinja2 templates (index, dashboard, FAQ).
+* **Explainability:** Uses SHAP to reveal key contributing factors for each prediction.
+* **AI Summaries:** Generates human-readable assessments and recommendations via OpenRouter.
+* **Resilience:** Includes fallback logic for missing models or unavailable APIs.
+* **Automation (Robust CI/CD):** CI/CD pipeline for automated testing, linting, and Docker builds via GitHub Actions.
+* **Scalability (Containerized Deployment):** Dockerized for fast and consistent deployment across environments.
+* **Health Checks:** Dedicated endpoint for monitoring service status.
+
+## 🧪 Testing
+Run automated tests:
 ```bash
-# 1. Navigate to the src directory
-cd src
+    pytest --maxfail=1 --disable-warnings -q
+```
 
-# 2. Install training dependencies
-pip install -r ../backend/requirements.txt
+## 🚀 Deployment
+Option 1: Using Docker
+```
+    docker build -t gbv-predictive-tool .
+    docker run -p 8000:8000 gbv-predictive-tool
+```
 
-# 3. Run the training pipeline
-python training/train.py
+Option 2: Render Deployment
+Render automatically deploys using:
+    * Dockerfile
+    * .github/workflows/ci-cd.yml
+    * render.yaml
+
+## 🩺 Health Check
+API health endpoint:
+```
+    GET /health
+```
+Response: 
+```
+    { "status": "healthy" }
+```
+## 🧰 Technology Stack
+
+| Component            | Technology         |
+| -------------------- | ------------------ |
+| Framework            | FastAPI            |
+| ML Model             | Gradient Boosting  |
+| Explainability       | SHAP               |
+| Generative Summaries | OpenRouter API     |
+| CI/CD                | GitHub Actions     |
+| Deployment           | Docker, Render.com |
+| Language             | Python 3.11        |
+
+
+## 📜 License
+This project is distributed under the MIT License.
+
+🤝 Contributors
+    * Lead Developer: ’Wale Ogundeji
+    * Contributors: AHFID AI Team
