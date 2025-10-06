@@ -47,12 +47,14 @@ Predictions are explained via SHAP and summarized using generative AI.
 3. Feature engineering summary
 
 Derived scores are created from raw fields to capture risk drivers and protective elements. Key engineered variables include
-    * economic_dependency_score, calculated from employment fields age and vulnerability flags
-    * financial_access_proxy, combining employment, education and vulnerability adjustments
-    * income_stability_score, using marital status, employment and age banding
-    * housing_security_score, driven by living arrangement and vulnerability flags
-    * social_isolation_score, based on living arrangement age and vulnerability flags
-    * community_connection_score, combining education, employment and marital status
+
+* economic_dependency_score, calculated from employment fields age and vulnerability flags
+* financial_access_proxy, combining employment, education and vulnerability adjustments
+* income_stability_score, using marital status, employment and age banding
+* housing_security_score, driven by living arrangement and vulnerability flags
+* social_isolation_score, based on living arrangement age and vulnerability flags
+* community_connection_score, combining education, employment and marital status
+
 The final model uses a subset defined in top_features.json to ensure consistent input ordering for SHAP and model inference.
 
 4. Model artifacts (Artifacts Directory)
