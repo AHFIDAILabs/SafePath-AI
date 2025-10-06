@@ -1,6 +1,6 @@
 # 🧭 SafePath-AI: GBV Vulnerability Predictive Tool
 
-SafePath-AI is a full-stack, data-driven machine learning application designed to **predict the vulnerability of individuals to Gender-Based Violence (GBV)** using socio-demographic and contextual indicators. It features a robust Python-based ML pipeline, a FastAPI-powered prediction API, **explainable AI (SHAP)**, and **AI-generated summaries** to provide interpretable, human-readable insights that support case management and social intervention decisions. It is fully containerized for reliable deployment.
+SafePath-AI is a full-stack, data-driven machine learning application designed to *predict the vulnerability of individuals to Gender-Based Violence (GBV)* using socio-demographic and contextual indicators. It features a robust *Python-based ML pipeline, a FastAPI-powered prediction API, explainable AI (SHAP), and AI-generated summaries* to provide interpretable, human-readable insights that support case management and social intervention decisions. It is fully containerized for reliable deployment.
 ---
 
 ## Table of contents
@@ -103,24 +103,24 @@ SafePath-AI/
 ## 📖 Overview 
 SafePath AI provides:
 
-    * **Risk Assessment** – A model that ingests demographic, behavioural and contextual data to compute a GBV risk score.
-    * **Explanation Engine** – Extracts the most influential risk and protective factors from the model output.
-    * **Recommendation Generator** – Produces actionable recommendations based on the top risk & protective factors.
+* **Risk Assessment** – A model that ingests demographic, behavioural and contextual data to compute a GBV risk score.
+* **Explanation Engine** – Extracts the most influential risk and protective factors from the model output.
+* **Recommendation Generator** – Produces actionable recommendations based on the top risk & protective factors.
     
 The backend exposes a simple REST API (`/predict`) that accepts JSON payloads and returns a structured response
 
 ## ⚙️ Installation and Setup
-    1. Prerequisites
-        * Python 3.11 or newer
-        * Docker (optional, for containerized environments)
-        * Model artifacts must exist in backend/artifacts
-        * OpenRouter API key (for AI-generated summaries)
+1. Prerequisites
+    * Python 3.11 or newer
+    * Docker (optional, for containerized environments)
+    * Model artifacts must exist in backend/artifacts
+    * OpenRouter API key (for AI-generated summaries)
 
-    2. Clone the Repository
-    ```
-        git clone https://github.com/<your-org>/SafePath-AI.git
-        cd SafePath-AI
-    ```
+2. Clone the Repository
+```
+    git clone https://github.com/<your-org>/SafePath-AI.git
+    cd SafePath-AI
+```
 
     3. Backend Installation
     ```
