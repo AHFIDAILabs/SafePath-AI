@@ -197,9 +197,9 @@ Option 1: Using Docker
 
 Option 2: Render Deployment
 Render automatically deploys using:
-    * Dockerfile
-    * .github/workflows/ci-cd.yml
-    * render.yaml
+* Dockerfile
+* `.github/workflows/ci-cd.yml`
+* render.yaml
 
 ## 🩺 Health Check
 API health endpoint:
