@@ -1,17 +1,20 @@
 # 🧭 SafePath-AI: GBV Vulnerability Predictive Tool
+
 SafePath-AI is a full-stack, data-driven machine learning application designed to **predict the vulnerability of individuals to Gender-Based Violence (GBV)** using socio-demographic and contextual indicators. It features a robust Python-based ML pipeline, a FastAPI-powered prediction API, **explainable AI (SHAP)**, and **AI-generated summaries** to provide interpretable, human-readable insights that support case management and social intervention decisions. It is fully containerized for reliable deployment.
 ---
 
 ## Table of contents
-* Project structure
+* Project Structure
 * Overview
 * Installation and Setup
-* API reference
-Technical documentation
-Testing and CI
-Deployment
-Security and operational notes
-How to extend
+* Prediction API
+* Core Features
+* Testing
+* Deployment
+* Health Check
+* Technology Stack
+* License
+
 
 ## 🏗️ Project Structure
 The project is organized into two main components: backend (the ML pipeline and API) and frontend (the user interface).
@@ -99,6 +102,7 @@ SafePath-AI/
 
 ## 📖 Overview 
 SafePath AI provides:
+
     * **Risk Assessment** – A model that ingests demographic, behavioural and contextual data to compute a GBV risk score.
     * **Explanation Engine** – Extracts the most influential risk and protective factors from the model output.
     * **Recommendation Generator** – Produces actionable recommendations based on the top risk & protective factors.
@@ -113,26 +117,25 @@ The backend exposes a simple REST API (`/predict`) that accepts JSON payloads an
         * OpenRouter API key (for AI-generated summaries)
 
     2. Clone the Repository
-    ```bash
+    ```
         git clone https://github.com/<your-org>/SafePath-AI.git
         cd SafePath-AI
     ```
 
     3. Backend Installation
-    ```bash
+    ```
         cd backend
         pip install -r requirements.txt
     ```
-
     4. Environment Configuration
        Create a .env file in the project root:
-    ```env
+    ```
         OPENROUTER_API_KEY=your_api_key_here
     ```
     If this key is not provided, the API will automatically use an intelligent fallback summary generator.
 
     5. Run the API Server
-    ```bash
+    ```
         uvicorn app.main:app --reload --port 8000
     ```
     Access the API documentation at: http://localhost:8000/docs
@@ -220,10 +223,10 @@ Response:
 | Deployment           | Docker, Render.com |
 | Language             | Python 3.11        |
 
-
 ## 📜 License
 This project is distributed under the MIT License.
 
-🤝 Contributors
+## 🤝 Contributors
+
     * Lead Developer: ’Wale Ogundeji
     * Contributors: AHFID AI Team
