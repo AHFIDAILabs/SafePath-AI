@@ -1,7 +1,6 @@
 # 🧭 SafePath-AI: GBV Vulnerability Predictive Tool
 
 SafePath-AI is a full-stack, data-driven machine learning application designed to *predict the vulnerability of individuals to Gender-Based Violence (GBV)* using socio-demographic and contextual indicators. It features a robust *Python-based ML pipeline, a FastAPI-powered prediction API, explainable AI (SHAP), and AI-generated summaries* to provide interpretable, human-readable insights that support case management and social intervention decisions. It is fully containerized for reliable deployment.
----
 
 ## Table of contents
 * Project Structure
