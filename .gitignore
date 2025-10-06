@@ -145,12 +145,9 @@ env.bak/
 venv.bak/
 gbv-venv/
 
-# files created
-notebooks/ 
-model/
+# files created 
 requirements_dev.txt
 setup.py
-notebooks/
 
 # Spyder project settings
 .spyderproject
