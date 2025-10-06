@@ -122,23 +122,23 @@ The backend exposes a simple REST API (`/predict`) that accepts JSON payloads an
     cd SafePath-AI
 ```
 
-    3. Backend Installation
-    ```
-        cd backend
-        pip install -r requirements.txt
-    ```
-    4. Environment Configuration
-       Create a .env file in the project root:
-    ```
-        OPENROUTER_API_KEY=your_api_key_here
-    ```
-    If this key is not provided, the API will automatically use an intelligent fallback summary generator.
+3. Backend Installation
+```
+    cd backend
+    pip install -r requirements.txt
+```
+4. Environment Configuration
+    Create a .env file in the project root:
+```
+    OPENROUTER_API_KEY=your_api_key_here
+```
+If this key is not provided, the API will automatically use an intelligent fallback summary generator.
 
-    5. Run the API Server
-    ```
-        uvicorn app.main:app --reload --port 8000
-    ```
-    Access the API documentation at: http://localhost:8000/docs
+5. Run the API Server
+```
+    uvicorn app.main:app --reload --port 8000
+```
+Access the API documentation at: http://localhost:8000/docs
 
 ## 🧠 Prediction API
 Endpoint: POST /api/v1/predict
@@ -228,5 +228,5 @@ This project is distributed under the MIT License.
 
 ## 🤝 Contributors
 
-    * Lead Developer: ’Wale Ogundeji
-    * Contributors: AHFID AI Team
+* Lead Developer: ’Wale Ogundeji
+* Contributors: AHFID AI Team
